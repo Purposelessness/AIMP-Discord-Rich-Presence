@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Drawing;
 using AIMP;
 using AIMP.SDK;
+using AIMP.SDK.AlbumArt;
 using AIMP.SDK.MenuManager;
 using AIMP.SDK.MenuManager.Objects;
 using AIMP.SDK.MessageDispatcher;
 
 namespace AIMP_Discord_Rich_Presence
 {
-    [AimpPlugin("Discord Rich Presence", "Purposelessness", "1.00", 
+    [AimpPlugin("Discord Rich Presence", "Purposelessness", "1.00",
         AimpPluginType = AimpPluginType.Addons, Description = "Displaying the playing track in the discord profile")]
     public class Plugin : AimpPlugin
     {
@@ -28,8 +30,9 @@ namespace AIMP_Discord_Rich_Presence
                     Player.ServiceMenuManager.Add(ParentMenuType.CommonUtilities, result);
                 }
             }
-            
+
             _trackInfoForm = new TrackInfoForm();
+            Debug.Instance.OnLogInvoked += (sender, s) => { _trackInfoForm.SetDebugString(s); };
             _hook = new MessageHook();
             Player.ServiceMessageDispatcher.Hook(_hook);
             _hook.OnCoreMessage += (message, param1, param2) =>
@@ -38,33 +41,34 @@ namespace AIMP_Discord_Rich_Presence
                 {
                     case AimpCoreMessageType.EventStreamStart:
                         UpdateTrackInfo();
-                        UpdateTrackCover();
-                        _trackInfoForm.SetDebugString("EventStreamStart");
+                        Debug.Instance.Log("[AimpCoreMessageType]: EventStreamStart");
                         break;
                 }
+
                 return ActionResultType.OK;
             };
         }
 
-        private void UpdateTrackInfo()
-        {
-            var fileInfo = Player.ServicePlayer.CurrentFileInfo;
-            if (fileInfo != null)
-            {
-                _trackInfoForm.SetTrackInfo(fileInfo.Title, fileInfo.Album, fileInfo.Artist);
-            }
-            else
-            {
-                _trackInfoForm.SetTrackInfo("none", "none", "none");
-            }
-        }
-
-        private void UpdateTrackCover()
+        private async void UpdateTrackInfo()
         {
             var fileInfo = Player.ServicePlayer.CurrentFileInfo;
             if (fileInfo == null)
+            {
+                _trackInfoForm.SetTrackInfo(new TrackInfo("none", "none", "none", "none"));
                 return;
-            _trackInfoForm.SetTrackCover(fileInfo.AlbumArt);
+            }
+
+            _trackInfoForm.SetTrackInfo(new TrackInfo(fileInfo));
+            var albumCoverFromFile = fileInfo.AlbumArt;
+            if (albumCoverFromFile != null)
+            {
+                _trackInfoForm.SetTrackCover(albumCoverFromFile);
+                return;
+            }
+
+            var albumCover = await AimpAlbumCoverProvider.GetAlbumCoverAsync(Player);
+            if (albumCover != null)
+                _trackInfoForm.SetTrackCover(albumCover);
         }
 
         private void ShowTrackInfoForm(object sender, EventArgs eventArgs)
@@ -74,6 +78,7 @@ namespace AIMP_Discord_Rich_Presence
                 _trackInfoForm = new TrackInfoForm();
                 UpdateTrackInfo();
             }
+
             _trackInfoForm?.Show();
         }
 
