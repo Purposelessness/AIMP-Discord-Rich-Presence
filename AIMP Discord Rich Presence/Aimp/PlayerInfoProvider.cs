@@ -39,8 +39,7 @@ namespace AIMP_Discord_Rich_Presence.Aimp
                     OnPlayerStateChanged(param1);
                     break;
                 case AimpCoreMessageType.EventPlayerUpdatePosition:
-                    Position = _player.ServicePlayer.Position;
-                    OnPositionChanged?.Invoke(this, Position);
+                    OnPlayerPositionChanged();
                     break;
                 case AimpCoreMessageType.EventPlayingFileInfo:
                     UpdateTrackInfo();
@@ -70,7 +69,15 @@ namespace AIMP_Discord_Rich_Presence.Aimp
                     Log("Player is playing");
                     break;
             }
+            OnPlayerPositionChanged();
         }
+        
+        private void OnPlayerPositionChanged()
+        {
+            Position = _player.ServicePlayer.Position;
+            OnPositionChanged?.Invoke(this, Position);
+        }
+
 
         private void UpdateTrackInfo()
         {
