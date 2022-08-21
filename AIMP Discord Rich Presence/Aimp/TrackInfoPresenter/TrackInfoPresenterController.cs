@@ -8,17 +8,18 @@ namespace AIMP_Discord_Rich_Presence.Aimp.TrackInfoPresenter
     public class TrackInfoPresenterController : IDisposable
     {
         private TrackInfoPresenterView _view;
-        private readonly TrackInfoProvider _provider;
+        private readonly PlayerInfoProvider _infoProvider;
 
-        public TrackInfoPresenterController(IAimpPlayer player, TrackInfoProvider provider)
+        public TrackInfoPresenterController(IAimpPlayer player, PlayerInfoProvider infoProvider)
         {
-            _provider = provider;
+            _infoProvider = infoProvider;
             
             _view = new TrackInfoPresenterView();
             Debug.Instance.OnLogInvoked += (sender, s) => { _view.SetDebugString(s); };
 
-            _provider.OnInfoUpdated += OnTrackInfoUpdated;
-            _provider.OnCoverUpdated += OnTrackCoverUpdated;
+            _infoProvider.OnInfoUpdated += OnTrackInfoUpdated;
+            _infoProvider.OnCoverUpdated += OnTrackCoverUpdated;
+            _infoProvider.OnStateUpdated += OnPlayerStateUpdated;
             
             CreateMenuItem(player);
         }
@@ -40,7 +41,7 @@ namespace AIMP_Discord_Rich_Presence.Aimp.TrackInfoPresenter
             if (_view == null || _view.IsDisposed)
             {
                 _view  = new TrackInfoPresenterView();
-                _view.SetTrackInfo(_provider.Info);
+                _view.SetTrackInfo(_infoProvider.TrackInfo);
             }
             
             _view.Show();
@@ -48,18 +49,39 @@ namespace AIMP_Discord_Rich_Presence.Aimp.TrackInfoPresenter
 
         private void OnTrackInfoUpdated(object o, EventArgs args)
         {
-            _view.SetTrackInfo(_provider.Info);
+            _view.SetTrackInfo(_infoProvider.TrackInfo);
         }
 
         private void OnTrackCoverUpdated(object o, EventArgs args)
         {
-            _view.SetTrackCover(_provider.Info.AlbumCover);
+            _view.SetTrackCover(_infoProvider.TrackInfo.AlbumCover);
+        }
+        
+        private void OnPlayerStateUpdated(object sender, AimpPlayerState e)
+        { 
+            string stateString;
+            switch (e)
+            {
+                case AimpPlayerState.Stopped:
+                    stateString = "Stopped";
+                    break;
+                case AimpPlayerState.Pause:
+                    stateString = "Paused"; 
+                    break;
+                case AimpPlayerState.Playing:
+                    stateString = "Playing";
+                    break;
+                default:
+                    stateString = "Unknown";
+                    break;
+            }
+            _view.SetPlayerState(stateString);
         }
         
         public void Dispose()
         {
-            _provider.OnInfoUpdated -= OnTrackInfoUpdated;
-            _provider.OnCoverUpdated -= OnTrackCoverUpdated;
+            _infoProvider.OnInfoUpdated -= OnTrackInfoUpdated;
+            _infoProvider.OnCoverUpdated -= OnTrackCoverUpdated;
             _view.Dispose();
         }
     }

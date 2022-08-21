@@ -30,6 +30,11 @@ namespace AIMP_Discord_Rich_Presence.Aimp.TrackInfoPresenter
             _coverPicture.Image = cover;
         }
 
+        public void SetPlayerState(string state)
+        {
+            _playerStateLabel.Text = state;
+        }
+        
         public void SetDebugString(string message)
         {
             _debugBox.Text = _debugBox.Text + message + Environment.NewLine;
@@ -48,6 +53,7 @@ namespace AIMP_Discord_Rich_Presence.Aimp.TrackInfoPresenter
             this._artistLabel = new System.Windows.Forms.Label();
             this._coverPicture = new System.Windows.Forms.PictureBox();
             this._debugBox = new System.Windows.Forms.TextBox();
+            this._playerStateLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this._coverPicture)).BeginInit();
             this.SuspendLayout();
             // 
@@ -102,10 +108,21 @@ namespace AIMP_Discord_Rich_Presence.Aimp.TrackInfoPresenter
             this._debugBox.TabIndex = 4;
             this._debugBox.Text = "DEBUG:\r\n";
             // 
+            // _playerState
+            // 
+            this._playerStateLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._playerStateLabel.Location = new System.Drawing.Point(344, 188);
+            this._playerStateLabel.Name = "_playerStateLabel";
+            this._playerStateLabel.Size = new System.Drawing.Size(311, 34);
+            this._playerStateLabel.TabIndex = 5;
+            this._playerStateLabel.Text = "Stopped";
+            this._playerStateLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // TrackInfoPresenterView
             // 
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(667, 443);
+            this.Controls.Add(this._playerStateLabel);
             this.Controls.Add(this._debugBox);
             this.Controls.Add(this._coverPicture);
             this.Controls.Add(this._artistLabel);
@@ -118,6 +135,8 @@ namespace AIMP_Discord_Rich_Presence.Aimp.TrackInfoPresenter
             this.ResumeLayout(false);
             this.PerformLayout();
         }
+
+        private System.Windows.Forms.Label _playerStateLabel;
 
         private System.Windows.Forms.TextBox _debugBox;
 

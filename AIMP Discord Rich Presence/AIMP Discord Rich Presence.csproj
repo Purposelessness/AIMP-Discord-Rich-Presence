@@ -52,7 +52,7 @@
         <Compile Include="Aimp\TrackInfo.cs" />
         <Compile Include="Aimp\TrackInfoPresenter\TrackInfoPresenterController.cs" />
         <Compile Include="Aimp\TrackInfoPresenter\TrackInfoPresenterView.cs" />
-        <Compile Include="Aimp\TrackInfoProvider.cs" />
+        <Compile Include="Aimp\PlayerInfoProvider.cs" />
         <Compile Include="Plugin.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>

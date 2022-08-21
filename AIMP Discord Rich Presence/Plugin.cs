@@ -1,6 +1,8 @@
 ﻿using AIMP;
 using AIMP_Discord_Rich_Presence.Aimp;
 using AIMP_Discord_Rich_Presence.Aimp.TrackInfoPresenter;
+using AIMP.SDK;
+using AIMP.SDK.MessageDispatcher;
 
 namespace AIMP_Discord_Rich_Presence
 {
@@ -10,7 +12,7 @@ namespace AIMP_Discord_Rich_Presence
     {
         public override void Initialize()
         {
-            var trackInfoProvider = new TrackInfoProvider(Player);
+            var trackInfoProvider = new PlayerInfoProvider(Player);
             var trackInfoPresenterController = new TrackInfoPresenterController(Player, trackInfoProvider);
         }
 

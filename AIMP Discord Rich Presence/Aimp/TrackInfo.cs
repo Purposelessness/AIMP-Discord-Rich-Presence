@@ -37,7 +37,6 @@ namespace AIMP_Discord_Rich_Presence.Aimp
         public void SetCover(Image albumCover)
         {
             AlbumCover = albumCover;
-            Debug.Instance.Log($"[TrackInfo]: SetCover() -> {AlbumCover == null}");
         }
 
         public bool IsAlbumCoverNull() => AlbumCover == null;
