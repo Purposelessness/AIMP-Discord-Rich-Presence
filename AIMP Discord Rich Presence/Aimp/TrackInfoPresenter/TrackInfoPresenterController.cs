@@ -17,11 +17,17 @@ namespace AIMP_Discord_Rich_Presence.Aimp.TrackInfoPresenter
             _view = new TrackInfoPresenterView();
             Debug.Instance.OnLogInvoked += (sender, s) => { _view.SetDebugString(s); };
 
-            _infoProvider.OnInfoUpdated += OnTrackInfoUpdated;
-            _infoProvider.OnCoverUpdated += OnTrackCoverUpdated;
-            _infoProvider.OnStateUpdated += OnPlayerStateUpdated;
-            
+            _infoProvider.OnInfoChanged += OnTrackInfoUpdated;
+            _infoProvider.OnCoverChanged += OnTrackCoverUpdated;
+            _infoProvider.OnStateChanged += OnPlayerStateUpdated;
+            _infoProvider.OnPositionChanged += OnPlayerPositionChanged;
+
             CreateMenuItem(player);
+        }
+
+        private void OnPlayerPositionChanged(object sender, double e)
+        {
+            _view.SetPlayerPosition(e);
         }
 
         private void CreateMenuItem(IAimpPlayer player)
@@ -70,8 +76,10 @@ namespace AIMP_Discord_Rich_Presence.Aimp.TrackInfoPresenter
         
         public void Dispose()
         {
-            _infoProvider.OnInfoUpdated -= OnTrackInfoUpdated;
-            _infoProvider.OnCoverUpdated -= OnTrackCoverUpdated;
+            _infoProvider.OnInfoChanged -= OnTrackInfoUpdated;
+            _infoProvider.OnCoverChanged -= OnTrackCoverUpdated;
+            _infoProvider.OnStateChanged -= OnPlayerStateUpdated;
+            _infoProvider.OnPositionChanged -= OnPlayerPositionChanged;
             _view.Dispose();
         }
     }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using AIMP.SDK;
 using AIMP.SDK.MessageDispatcher;
 
@@ -13,12 +12,13 @@ namespace AIMP_Discord_Rich_Presence.Aimp
         private TrackInfo _currentTrackTrackInfo;
 
         public TrackInfo TrackInfo => _currentTrackTrackInfo;
-
         public AimpPlayerState State { get; private set; }
+        public double Position { get; private set; }
 
-        public EventHandler OnInfoUpdated;
-        public EventHandler OnCoverUpdated;
-        public EventHandler<AimpPlayerState> OnStateUpdated;
+        public EventHandler OnInfoChanged;
+        public EventHandler OnCoverChanged;
+        public EventHandler<AimpPlayerState> OnStateChanged;
+        public EventHandler<double> OnPositionChanged;
 
         public PlayerInfoProvider(IAimpPlayer player)
         {
@@ -38,8 +38,11 @@ namespace AIMP_Discord_Rich_Presence.Aimp
                 case AimpCoreMessageType.EventPlayerState:
                     OnPlayerStateChanged(param1);
                     break;
+                case AimpCoreMessageType.EventPlayerUpdatePosition:
+                    Position = _player.ServicePlayer.Position;
+                    OnPositionChanged?.Invoke(this, Position);
+                    break;
                 case AimpCoreMessageType.EventPlayingFileInfo:
-                    Log("File info changed");
                     UpdateTrackInfo();
                     break;
             }
@@ -53,17 +56,17 @@ namespace AIMP_Discord_Rich_Presence.Aimp
             {
                 case 0:
                     State = AimpPlayerState.Stopped;
-                    OnStateUpdated?.Invoke(this, AimpPlayerState.Stopped);
+                    OnStateChanged?.Invoke(this, AimpPlayerState.Stopped);
                     Log("Player is stopped");
                     break;
                 case 1:
                     State = AimpPlayerState.Pause;
-                    OnStateUpdated?.Invoke(this, AimpPlayerState.Pause);
+                    OnStateChanged?.Invoke(this, AimpPlayerState.Pause);
                     Log("Player is paused");
                     break;
                 case 2:
                     State = AimpPlayerState.Playing;
-                    OnStateUpdated?.Invoke(this, AimpPlayerState.Playing);
+                    OnStateChanged?.Invoke(this, AimpPlayerState.Playing);
                     Log("Player is playing");
                     break;
             }
@@ -74,10 +77,12 @@ namespace AIMP_Discord_Rich_Presence.Aimp
             var fileInfo = _player.ServicePlayer.CurrentFileInfo;
             if (fileInfo == null)
             {
-                _currentTrackTrackInfo.IsPlaying = false;
                 Log("There is no file in player.");
                 return;
             }
+
+            if (fileInfo.Duration == 0)
+                fileInfo.Duration = _player.ServicePlayer.Duration;
 
             _currentTrackTrackInfo.Set(fileInfo);
             Log($"File updated: " +
@@ -89,7 +94,7 @@ namespace AIMP_Discord_Rich_Presence.Aimp
                 UpdateCoverViaProvider();
             }
 
-            OnInfoUpdated?.Invoke(this, null);
+            OnInfoChanged?.Invoke(this, null);
         }
 
         private async void UpdateCoverViaProvider()
@@ -98,13 +103,13 @@ namespace AIMP_Discord_Rich_Presence.Aimp
             var albumCover = await AlbumCoverProvider.GetAlbumCoverAsync(_player);
             _currentTrackTrackInfo.SetCover(albumCover);
             if (previousCover != albumCover)
-                OnCoverUpdated?.Invoke(this, null);
+                OnCoverChanged?.Invoke(this, null);
             Log($"Cover loaded using {nameof(AlbumCoverProvider)}");
         }
 
         private static void Log(string message)
         {
-            Debug.Instance.Log("[TrackInfoProvider]: " + message);
+            Debug.Instance.Log("[PlayerInfoProvider] " + message);
         }
 
         public void Dispose()
