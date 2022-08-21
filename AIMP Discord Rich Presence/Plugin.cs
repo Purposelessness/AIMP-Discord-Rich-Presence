@@ -1,8 +1,6 @@
 ﻿using AIMP;
 using AIMP_Discord_Rich_Presence.Aimp;
 using AIMP_Discord_Rich_Presence.Aimp.TrackInfoPresenter;
-using AIMP.SDK;
-using AIMP.SDK.MessageDispatcher;
 
 namespace AIMP_Discord_Rich_Presence
 {

@@ -41,10 +41,16 @@ namespace AIMP_Discord_Rich_Presence.Aimp.TrackInfoPresenter
             if (_view == null || _view.IsDisposed)
             {
                 _view  = new TrackInfoPresenterView();
-                _view.SetTrackInfo(_infoProvider.TrackInfo);
+                UpdateView();
             }
             
             _view.Show();
+        }
+
+        private void UpdateView()
+        {
+            _view.SetTrackInfo(_infoProvider.TrackInfo);
+            _view.SetPlayerState(_infoProvider.State.ToString());
         }
 
         private void OnTrackInfoUpdated(object o, EventArgs args)
@@ -59,23 +65,7 @@ namespace AIMP_Discord_Rich_Presence.Aimp.TrackInfoPresenter
         
         private void OnPlayerStateUpdated(object sender, AimpPlayerState e)
         { 
-            string stateString;
-            switch (e)
-            {
-                case AimpPlayerState.Stopped:
-                    stateString = "Stopped";
-                    break;
-                case AimpPlayerState.Pause:
-                    stateString = "Paused"; 
-                    break;
-                case AimpPlayerState.Playing:
-                    stateString = "Playing";
-                    break;
-                default:
-                    stateString = "Unknown";
-                    break;
-            }
-            _view.SetPlayerState(stateString);
+            _view.SetPlayerState(e.ToString());
         }
         
         public void Dispose()
