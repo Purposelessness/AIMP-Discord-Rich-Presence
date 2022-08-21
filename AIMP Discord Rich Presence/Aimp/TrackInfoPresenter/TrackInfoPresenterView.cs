@@ -2,11 +2,11 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace AIMP_Discord_Rich_Presence
+namespace AIMP_Discord_Rich_Presence.Aimp.TrackInfoPresenter
 {
-    public class TrackInfoForm : Form
+    public class TrackInfoPresenterView : Form
     {
-        public TrackInfoForm()
+        public TrackInfoPresenterView()
         {
             InitializeComponent();
             foreach (var message in Debug.Instance.List)
@@ -20,10 +20,13 @@ namespace AIMP_Discord_Rich_Presence
             _titleLabel.Text = trackInfo.Title;
             _albumLabel.Text = trackInfo.Album;
             _artistLabel.Text = trackInfo.Artist;
+            SetTrackCover(trackInfo.AlbumCover);
         }
 
         public void SetTrackCover(Image cover)
         {
+            if (cover == null)
+                return;
             _coverPicture.Image = cover;
         }
 
@@ -99,7 +102,7 @@ namespace AIMP_Discord_Rich_Presence
             this._debugBox.TabIndex = 4;
             this._debugBox.Text = "DEBUG:\r\n";
             // 
-            // TrackInfoForm
+            // TrackInfoPresenterView
             // 
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(667, 443);
@@ -109,7 +112,7 @@ namespace AIMP_Discord_Rich_Presence
             this.Controls.Add(this._albumLabel);
             this.Controls.Add(this._titleLabel);
             this.Location = new System.Drawing.Point(15, 15);
-            this.Name = "TrackInfoForm";
+            this.Name = "TrackInfoPresenterView";
             this.Padding = new System.Windows.Forms.Padding(10);
             ((System.ComponentModel.ISupportInitialize)(this._coverPicture)).EndInit();
             this.ResumeLayout(false);

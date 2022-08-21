@@ -2,7 +2,7 @@
 using AIMP.SDK;
 using AIMP.SDK.MessageDispatcher;
 
-namespace AIMP_Discord_Rich_Presence
+namespace AIMP_Discord_Rich_Presence.Aimp
 {
     public class MessageHook : IAimpMessageHook
     {

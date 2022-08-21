@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace AIMP_Discord_Rich_Presence
+namespace AIMP_Discord_Rich_Presence.Aimp
 {
     public class Debug
     {
